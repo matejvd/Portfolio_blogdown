@@ -1,0 +1,131 @@
+---
+title: "Creating interactive maps with Leaflet"
+author: "Matěj Voda"
+date: "5/26/2021"
+output: html_document
+---
+
+## What is Leaflet? 
+
+Leaflet is a super popular open-source JavaScript library for creating interactive maps. I feel like everybody uses it. You have probably already seen it too. It lurks all across the world wide web, hiding in contact sections.... 
+
+But rarely it is used to its full potential. 
+
+Anyway, if you want to see the documentation and some nice examples, check out the link here: <https://rstudio.github.io/leaflet/>. 
+
+In the following few lines of code, I am going to walk you through the process of how I created an interactive map of living expectancy for men and women in the Czech Republic. 
+
+First load all (or install with "install.packages()" the required packages.
+
+Tidyverse is a set of packages. In this case, we are primarily interested in the package dplyr, which contains functions for data manipulation.
+
+I am also loading two other packages: RCzechia and czso. The former contains, among other things, various shapefiles of administrative units of Czech Republic, the latter gets data from the open data kindly made accessible by the Czech Statistical Office. 
+
+The packages czso was created by Petr Bouchal. He has made a number of amazing packages. Hi Petr! :) Check out his work here: <https://petrbouchal.xyz/work/>. 
+
+The amazing package RCzechia was created by Jindrich Lacko. You can find his work and useful tutorials here:  <https://www.jla-data.net/eng/>.
+
+And finally, we have to load, ba dum tsss, Leaflet. 
+
+```{r, eval=True}
+library(tidyverse)
+library(RCzechia)
+library(czso)
+library(leaflet)
+
+```
+
+## And now let's get data 
+
+I will comment one the right side of the code following # sign. 
+
+```{r, echo=TRUE}
+LifeExpect <- czso::czso_get_table("130140") # getting the table we want from the open data 
+
+LifeExpect %>% 
+  filter(pohlavi_txt == "muž") -> LifeExpect2 # filtering for men
+
+LifeExpect2%>% 
+  filter(vek_txt == "0 až 1 (více nebo rovno 0 a méně než 1)") -> LifeExpect3 # filtering for life expectancy at birth 
+
+LifeExpect3$casref_do <- as.character(LifeExpect3$casref_do) # transforming data so we can work with it 
+
+LifeExpect3 %>% 
+  filter(casref_do == "2019-12-31") -> LifeExpect4 # we want only the most recent data 
+
+okresni_data2 <- RCzechia::okresy("low") %>% # loading the shape file
+  inner_join(LifeExpect4, by = c("KOD_OKRES" = "vuzemi_kod")) # and finally, joining the shapefile with the data so that we can visualize it 
+
+bins <- c(72,73,74,75,76, 77, 78,79) # creating bins which will determine the color palette 
+    
+pal3 <- colorBin(palette = "Spectral",  domain = okresni_data2$hodnota, bins = bins) # creating the color palette
+```
+
+## We can do the same the thing for women 
+
+its the exact same process, we just filter for women (žena)
+
+```{r, echo=TRUE}
+LifeExpect <- czso::czso_get_table("130140")
+
+LifeExpect %>% 
+  filter(pohlavi_txt == "žena") -> LifeExpect2Z 
+
+LifeExpect2Z%>% 
+  filter(vek_txt == "0 až 1 (více nebo rovno 0 a méně než 1)") -> LifeExpect3Z
+
+LifeExpect3Z$casref_do <- as.character(LifeExpect3Z$casref_do)
+
+LifeExpect3Z %>% 
+  filter(casref_do == "2019-12-31") -> LifeExpect4Z
+
+okresni_data3 <- RCzechia::okresy("low") %>% # data shapefile
+  inner_join(LifeExpect4Z, by = c("KOD_OKRES" = "vuzemi_kod")) 
+
+bins2 <- c(78,79,80,81, 82, 83, 84)
+
+pal4 <- colorBin(palette = "Spectral",  domain = okresni_data3$hodnota, bins = bins2)
+```
+
+## Shall we visualize
+
+This is going to be a bit long and complicated so please also refer to the leaflet package if you do not understand anything. 
+
+The point here is to show you some of the functions that Leaflet can be used for, although I think this map also tells the reader a lot about inequality and varying quality of life within Czechia. 
+
+```{r, echo=TRUE}
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(data = okresni_data3, group = "Women", # creating the first group - women
+              popup = ~ paste0("<b>", NAZ_LAU1, "</b><br>Naděje dožití žen: ", hodnota,  "<br>"), # popups will appear when you click on map tiles
+              fillColor = ~pal4(hodnota), # adding the palette that we created before
+              color = "blue",
+              fillOpacity = 0.75,
+              opacity = 1/3, 
+              weight = 1, 
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", # because highlighting is cool
+                                                  weight = 2,
+                                                  bringToFront = TRUE))%>%
+  addLegend("bottomright", pal = pal4, values = okresni_data3$hodnota, group = "Ženy", 
+            title = "Naděje dožití žen v roce 2019",
+            opacity = 0.75) %>% # lets add a legend for women
+  addPolygons(data = okresni_data2, group = "Muži", # now lets add another group with men
+              popup = ~ paste0("<b>", NAZ_LAU1, "</b><br>Naděje dožití mužů: ", hodnota, "<br>"),
+              fillColor = ~pal3(hodnota),
+              color = "blue",
+              fillOpacity = 0.75,
+              opacity = 1/3, 
+              weight = 1, 
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", 
+                                                  weight = 2,
+                                                  bringToFront = TRUE))%>%
+  addLegend("bottomleft", pal = pal3, values = okresni_data2$hodnota, group = "Muži", 
+            title = "Naděje dožití mužů v roce 2019",
+            opacity = 0.75) %>% # adding another legend for men
+  addLayersControl( # and this is where you get to control all of what we put in before
+    overlayGroups = c("Ženy", "Muži"), # two groups by gender
+    options = layersControlOptions(collapsed = FALSE)) %>% 
+  hideGroup("Muži") # hide the group / men
+```

@@ -1,0 +1,110 @@
+---
+title: "Visualizing Eurostat open data"
+author: "Matěj Voda"
+date: "5/27/2021"
+output: html_document
+image:
+  caption: 'Image credit: [**John Moeses Bauan**](https://www.pexels.com/photo/macbook-pro-beside-papers-669619/)'
+  placement: 3
+---
+
+
+---
+## Let's get started 
+
+Assessing data has never been easier with the Eurostat package. Eurostat has access to a ton of amazing data sets and I would like to show you a couple of examples how you can access, manipulate and visualize that data. I hope you will find it useful. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Loading the libraries 
+
+As always we first have to load the libraries that we will use to wrangle and visualize the data. See the comments following # in the code chunk to get a better idea of what is going on. 
+
+```{r}
+library(tidyverse) # gives us the dplyr package that we use to manipulate data and ggplot to visualize them
+library(ggthemes) # gives us a bunch of pretty themes
+library(eurostat) # gives us access to the Eurostat open data collection
+```
+
+## Getting the data 
+
+Yes, it's that easy. Just use the search_eurostat function to look for tables that have the word "wage" in them. Then use the function get_eurostat to create a new object Povsex, where you filter two lists for sex and geo to get men and women and V4. 
+
+```{r}
+search <- search_eurostat("wage", type = "table") # using the search function to get all tables with the word wage in them 
+
+# you then have to look up the code for the particular data table that you want. In my case it was tessi010. 
+
+Povsex <- get_eurostat("tessi010", filter = list(sex = "F", sex = "M", 
+                                                 geo = "HU", geo = "CZ", geo = "SK", geo = "PL")) # then use the get_eurostat function to get it into your environment. You can already filter as I do here or you can do it after you download it. 
+```
+
+## Creating a line chart 
+
+The following line chart takes the data that we have extracted by using the eurostat package and visualizes it with ggplot. I have used the Economist theme to make it look extra fancy. 
+
+```{r}
+Povsex %>% select(time, values, geo, sex) %>% # take the Povsex object and select the columns that we want. 
+  ggplot(aes(x = time, y = values, color = geo)) + # we want time on the x axis and the values on the y axis. we also want the values to be colored by country
+  geom_line(aes(linetype=sex), size = 1.2, alpha = 0.8)+ # specifying the size and opacity of lines - the linetype will show the sex. 
+  geom_point() + # adding another geom onto the lines to make them easier to compare
+labs(title = "At-risk-of-poverty rate by sex V4", # adding description
+     subtitle = "so that we see a surprising trend in Czechia", 
+     y = "At-risk of poverty in %", color = "Country") +
+  theme_economist_white() + # addinga fancy theme
+  scale_color_brewer(palette = "Set1") # picking a color palette 
+```
+
+## Employment of recent grads
+
+In the folowing code chunk, I am follow the same steps but create a different chart. The charts shows the employment rates of recent graduates in V4 and SE. I was interested in seeing the difference between some CEE countries and SE countries. 
+
+The situation in Italy comes out as particularly striking when compared to the nearly full employment among men in Czechia or Slovakia. These two, however, habe the biggest difference between the share of employment among men and women. 
+
+```{r}
+Empsex <- get_eurostat("sdg_04_50", filter = list(time = "2019", sex = "F", sex = "M", 
+                              geo = "HU", geo = "CZ", geo = "SK", geo = "PL", geo = "IT", geo = "ES"))
+
+Empsex %>% select(values, geo, sex) %>%
+  ggplot(aes(x = geo, y = values, color = sex)) +
+geom_point(size = 3.0) +
+labs(title = "Employment rates of recent graduates by sex in 2019", 
+     subtitle = "so that we can compare SE with CEE (age 25-34)", 
+     y = "Employment in %", color = "Country") +
+  theme_fivethirtyeight() + 
+  scale_color_brewer(palette = "Set1")
+```
+
+## Visualizing unemployment 
+
+You can also create visualizations like these using the geom simple functions(geom_sf). I will dedicate a separate post to creating visualizations with geom_sf. For now, let's just consider this graph an example of all the gems that are stored in Eurostat database. 
+
+```{r}
+search <- search_eurostat("unemployment", type = "table")
+
+
+ct <- c("AT", "BE", "BG", "CY", "CZ", "DE", "DE", "DK", "EE", "EL", 
+        "ES", "FI", "FR", "HR", "HU", "IE", "IT", "LI", "LT", "LU",
+        "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK", "UK")
+
+un <- get_eurostat("tps00203", time_format = "num", filter = list(geo = ct))
+
+un %>% 
+filter(time == "2019" & unit == "PC_ACT") -> un2019
+
+mapdata <- get_eurostat_geospatial(nuts_level = 0) %>% 
+  right_join(un2019, by = "geo") %>%
+  na.omit() %>%
+  mutate(categories = cut_to_classes(values, n = 4, decimals = 1))
+
+ggplot(mapdata, aes(fill = categories)) + 
+  scale_fill_brewer(palette = "PuOr") + 
+  geom_sf(color = alpha("white", 1/3), alpha = .6) + 
+  labs(title = "EU unemployment in 2019", subtitle = "divided to 4 categories") +
+  xlim(c(-12,44)) + ylim(c(35,70))+
+  theme_minimal() +
+  theme(legend.text = element_text(size = rel(1.0), color = "black"), legend.position="bottom", legend.box = "horizontal") 
+```
+

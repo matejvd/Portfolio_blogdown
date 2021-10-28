@@ -23,31 +23,22 @@ date_format: Jan 2006
 #   Leave other parameters empty if not required.
 #   Begin multi-line descriptions with YAML's `|2-` multi-line prefix.
 item:
-- certificate_url: https://www.coursera.org
+- certificate_url: https://czecheval.cz
   date_end: ""
-  date_start: "2021-01-25"
-  description: ""
-  organization: Coursera
-  organization_url: https://www.coursera.org
-  title: Neural Networks and Deep Learning
+  date_start: "2021-03-25"
+  description: 5-day course by the Czech evaluation society, introducing policy evaluation, evaluation planning and implementation. 
+  organization: Czech Evaluation Society
+  organization_url: https://czecheval.cz/cs/Skoleni-a-kurzy/Evaluacni-minimum---informace-o-kurzu
+  title: Evaluation Minimum 
   url: ""
-- certificate_url: https://www.edx.org
+- certificate_url: https://czecheval.cz/cs/O-nas/Strategie
   date_end: ""
-  date_start: "2021-01-01"
-  description: Formulated informed blockchain models, hypotheses, and use cases.
-  organization: edX
-  organization_url: https://www.edx.org
-  title: Blockchain Fundamentals
-  url: https://www.edx.org/professional-certificate/uc-berkeleyx-blockchain-fundamentals
-- certificate_url: https://www.datacamp.com
-  date_end: "2020-12-21"
-  date_start: "2020-07-01"
-  description: ""
-  organization: DataCamp
-  organization_url: https://www.datacamp.com
-  title: 'Object-Oriented Programming in R'
-  url: ""
-
+  date_start: "2021-04-19"
+  description: 2-day course introducing Counter-factual impact evaluation. When to use it, what is required and how it is conducted. 
+  organization: Czech Evaluation Society
+  organization_url: https://czecheval.cz
+  title: Mysterious counter-factual 
+  url: https://czecheval.cz/cs/Skoleni-a-kurzy/Tajemny-kontrafaktual
 design:
   columns: '2' 
 ---

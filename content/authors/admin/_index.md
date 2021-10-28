@@ -1,30 +1,30 @@
 ---
-bio: My research interests include distributed robotics, mobile computing and programmable
-  matter.
+bio: I am interested in interdisciplinary social science research, which draws on insights from network science, political economy and qualitative methodology. 
 education:
   courses:
   - course: M.A. in International Relations
     institution: Central European University
     year: 2020
-  - course: Study Abroad BGIA 
+  - course: Bard Globalization and International Affairs 
     institution: Bard College New York
     year: 2020
   - course: B.A. in Area Studies
     institution: Charles University in Prague
     year: 2018
-  - course: Study Abroad School of Slavonic and East European Studies
+  - course: School of Slavonic and East European Studies
     institution: University College London
-    year: 2016-2017
+    year: 2017
 email: ""
 highlight_name: false
 interests:
-- Artificial Intelligence
-- Computational Linguistics
-- Information Retrieval
+- Policy Evaluation
+- Data Analysis 
+- Policy Networks 
+- Cohesion Policy 
 organizations:
-- name: Stanford University
-  url: https://www.stanford.edu/
-role: Professor of Artificial Intelligence
+- name: Czech Ministry of Regional Development 
+  url: https://www.mmr.cz/en/homepage 
+role: Evaluation Coordinator 
 social:
 - icon: envelope
   icon_pack: fas
@@ -34,24 +34,24 @@ social:
   icon: twitter
   icon_pack: fab
   label: Follow me on Twitter
-  link: https://twitter.com/GeorgeCushen
+  link: https://twitter.com/MatejVoda
 - icon: graduation-cap
   icon_pack: fas
-  link: https://scholar.google.co.uk/citations?user=sIwtMXoAAAAJ
+  link: https://www.ceu.edu 
 - icon: github
   icon_pack: fab
-  link: https://github.com/gcushen
+  link: https://github.com/matejvd
 - icon: linkedin
   icon_pack: fab
-  link: https://www.linkedin.com/
+  link: https://www.linkedin.com/in/matěj-v-81666b178/
 superuser: true
 title: Matej Voda
 ---
 
-I coordinate policy evaluation for inclusive and evidence-based policymaking. 
+I coordinate inclusive policy evaluation for evidence-based policy-making within the EU funds section of the Czech Ministry of Regional Development. 
 
-• Policy Analysis • European Union • Programme Evaluation • Project Management • Cohesion Policy • Data Analysis • Data Visualisation
+I am passionate about inter-disciplinary social science research, innovative qualitative methodology and new technologies to conduct reproducible data science. 
 
-I am passionate about inter-disciplinary social science research, innovative qualitative methodology and public sector reform.
+• Policy Evaluation • European Union • Cohesion Policy • Data Science
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "media/demo_resume.pdf" "newtab" >}}resumé{{< /staticref >}}.
